@@ -6,11 +6,11 @@ import type { ReactNode } from "react";
 
 const navItems = [
   { label: "Overview", href: "/" },
+  { label: "Projects", href: "/projects" },
   { label: "Calendar", href: "/calendar" },
   { label: "Tasks", href: "/tasks" },
-  { label: "Team", href: "/team" },
-  { label: "Reports", href: "/#reports" },
-  { label: "Settings", href: "/#settings" },
+  { label: "Reports", href: "/reports" },
+  { label: "Settings", href: "/settings" },
 ];
 
 export function AppShell({
@@ -57,7 +57,9 @@ export function AppShell({
               { name: "Sam", role: "Developer" },
             ].map((member) => (
               <div className="member-item" key={member.name}>
-                <div className="avatar" style={{ background: "#4d8cff" }}>{member.name[0]}</div>
+                <div className="avatar" style={{ background: "#4d8cff" }}>
+                  {member.name[0]}
+                </div>
                 <div>
                   <strong>{member.name}</strong>
                   <span>{member.role}</span>
@@ -76,8 +78,12 @@ export function AppShell({
           </div>
 
           <div className="topbar-actions">
-            <button className="secondary-button">Share</button>
-            <Link href="/login" className="primary-button top-link-button">Sign in</Link>
+            <button className="secondary-button" type="button">
+              Share
+            </button>
+            <Link href="/login" className="primary-button top-link-button">
+              Sign in
+            </Link>
           </div>
         </header>
 
@@ -86,3 +92,4 @@ export function AppShell({
     </div>
   );
 }
+

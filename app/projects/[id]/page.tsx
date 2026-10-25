@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { AppShell } from "@/components/AppShell";
 
 const mockProject = {
@@ -51,13 +52,18 @@ export default function ProjectDetailPage() {
 
           <div className="member-list-inline">
             {mockProject.team.map((member) => (
-              <span className="team-chip" key={member}>{member}</span>
+              <span className="team-chip" key={member}>
+                {member}
+              </span>
             ))}
           </div>
 
-          <Link href="/projects" className="primary-button inline-button">Back to projects</Link>
+          <Link href="/projects" className="primary-button inline-button">
+            Back to projects
+          </Link>
         </div>
       </div>
     </AppShell>
   );
 }
+

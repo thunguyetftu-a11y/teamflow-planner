@@ -83,7 +83,6 @@ a {
   border-radius: 10px;
   color: #dfe9ff;
   text-decoration: none;
-  background: transparent;
   transition: all 0.2s ease;
 }
 
@@ -131,12 +130,6 @@ a {
   border-radius: 50%;
 }
 
-.avatar.large {
-  width: 48px;
-  height: 48px;
-  font-size: 18px;
-}
-
 .content-panel {
   padding: 24px;
 }
@@ -178,6 +171,21 @@ a {
 
 .top-link-button {
   line-height: 1;
+}
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filters-row select {
+  min-width: 180px;
+  background: white;
+  border: 1px solid #dfe7f2;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #203150;
 }
 
 .stats-grid {
@@ -298,7 +306,11 @@ a {
 
 .task-topline,
 .meta-row,
-.task-footer {
+.task-footer,
+.project-header-row,
+.project-metrics,
+.settings-row,
+.detail-grid {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -308,7 +320,11 @@ a {
 .task-project,
 .meta-row,
 .task-footer,
-.task-card p {
+.task-card p,
+.project-metrics,
+.settings-row span,
+.detail-copy,
+.meta-label {
   color: #5d7293;
   font-size: 12px;
 }
@@ -448,85 +464,123 @@ a {
   background: linear-gradient(135deg, #6aa8ff, #5a67ff);
 }
 
-.team-strip {
-  margin-top: 20px;
+.project-list,
+.settings-list,
+.member-list-inline {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
-.mini-member {
+.project-card {
+  border: 1px solid #ebf1fa;
+  border-radius: 14px;
+  padding: 16px;
+  background: #fafcff;
+}
+
+.project-progress {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
-  background: #fff;
-  border: 1px solid #e4ebf7;
-  border-radius: 14px;
 }
 
-.mini-member strong,
-.team-card strong {
-  display: block;
-  margin-bottom: 4px;
+.project-progress .progress-track {
+  margin: 0;
 }
 
-.mini-member span,
-.team-card p {
-  font-size: 12px;
-  color: #6a7d9d;
+.secondary-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #2d5eb5;
+  font-weight: 600;
 }
 
-.content-grid {
+.detail-layout {
   display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
   gap: 20px;
 }
 
-.two-column {
-  grid-template-columns: 1fr;
+.detail-copy {
+  margin: 0 0 16px;
+  line-height: 1.6;
 }
 
-.full-width {
-  width: 100%;
+.detail-grid {
+  justify-content: flex-start;
+  gap: 30px;
+  margin-top: 18px;
 }
 
-.calendar-week-grid {
+.detail-grid > div {
   display: grid;
-  grid-template-columns: repeat(7, minmax(120px, 1fr));
-  gap: 12px;
+  gap: 6px;
 }
 
-.calendar-day {
-  background: #f7faff;
-  border-radius: 14px;
-  padding: 12px;
-  min-height: 180px;
+.meta-label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.calendar-day-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  color: #4c678d;
+.member-list-inline {
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  margin-bottom: 18px;
 }
 
-.calendar-events {
-  display: grid;
-  gap: 8px;
-}
-
-.mini-event {
-  background: #e6efff;
-  color: #1e4a92;
-  border-radius: 8px;
-  padding: 8px 10px;
+.team-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #edf4ff;
+  color: #2b5aa3;
+  padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
 }
 
-.no-events {
+.inline-button {
+  display: inline-flex;
+  margin-top: 8px;
+}
+
+.chart-bars {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+  min-height: 240px;
+  padding: 20px 10px 0;
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+}
+
+.chart-bar {
+  width: 100%;
+  min-height: 30px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, #7bb8ff, #5867ff);
+}
+
+.chart-column span {
+  color: #6f83a5;
   font-size: 12px;
-  color: #8094b7;
+}
+
+.settings-row {
+  padding: 12px 0;
+  border-bottom: 1px solid #edf2fb;
+}
+
+.settings-row strong {
+  font-size: 13px;
+  color: #203150;
 }
 
 .task-table-wrap {
@@ -558,6 +612,13 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.avatar-mini {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
 }
 
 .status-badge {
@@ -598,35 +659,6 @@ a {
 .small-track {
   width: 100px;
   margin: 0;
-}
-
-.team-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.team-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.team-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid #ebf0f8;
-  border-radius: 14px;
-  background: #f9fbff;
-}
-
-.team-metrics {
-  margin-left: auto;
-  display: grid;
-  gap: 6px;
-  text-align: right;
-  color: #647d9d;
-  font-size: 12px;
 }
 
 .auth-shell {
@@ -694,7 +726,8 @@ a {
 }
 
 @media (max-width: 1100px) {
-  .main-grid {
+  .main-grid,
+  .detail-layout {
     grid-template-columns: 1fr;
   }
 
@@ -722,16 +755,20 @@ a {
     gap: 14px;
   }
 
-  .stats-grid,
-  .team-grid {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 
-  .team-list {
-    grid-template-columns: 1fr;
+  .filters-row {
+    flex-direction: column;
   }
 
-  .calendar-week-grid {
-    grid-template-columns: 1fr;
+  .filters-row select {
+    width: 100%;
+  }
+
+  .chart-bars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+

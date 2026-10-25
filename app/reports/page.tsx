@@ -13,21 +13,27 @@ export default function ReportsPage() {
     <AppShell title="Reports" subtitle="Performance and team health">
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: "#eaf4ff" }}>◔</div>
+          <div className="stat-icon" style={{ background: "#eaf4ff" }}>
+            ◔
+          </div>
           <div>
             <p>Delivery rate</p>
             <h3>87%</h3>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: "#edf8f2" }}>↗</div>
+          <div className="stat-icon" style={{ background: "#edf8f2" }}>
+            ↗
+          </div>
           <div>
             <p>Velocity</p>
             <h3>+18%</h3>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: "#fff3d9" }}>◎</div>
+          <div className="stat-icon" style={{ background: "#fff3d9" }}>
+            ◎
+          </div>
           <div>
             <p>Focus score</p>
             <h3>91</h3>
@@ -53,3 +59,4 @@ export default function ReportsPage() {
     </AppShell>
   );
 }
+

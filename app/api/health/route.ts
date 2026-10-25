@@ -6,3 +6,4 @@ export async function GET() {
     version: "1.0.0",
   });
 }
+

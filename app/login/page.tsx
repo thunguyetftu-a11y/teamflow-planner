@@ -26,7 +26,9 @@ export default function LoginPage() {
             <input type="password" placeholder="••••••••" />
           </label>
 
-          <button type="submit" className="primary-button auth-button">Sign in</button>
+          <button type="submit" className="primary-button auth-button">
+            Sign in
+          </button>
         </form>
 
         <div className="auth-links">
@@ -37,3 +39,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

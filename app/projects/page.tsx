@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { AppShell } from "@/components/AppShell";
 import { tasks } from "@/data/mockData";
 
@@ -13,10 +15,14 @@ export default function ProjectsPage() {
       <div className="stats-grid">
         {projectGroups.map((project) => (
           <div className="stat-card" key={project.name}>
-            <div className="stat-icon" style={{ background: "#edf4ff" }}>▣</div>
+            <div className="stat-icon" style={{ background: "#edf4ff" }}>
+              ▣
+            </div>
             <div>
               <p>{project.name}</p>
-              <h3>{project.completed}/{project.total}</h3>
+              <h3>
+                {project.completed}/{project.total}
+              </h3>
             </div>
           </div>
         ))}
@@ -29,28 +35,37 @@ export default function ProjectsPage() {
         </div>
 
         <div className="project-list">
-          {projectGroups.map((project) => (
-            <div className="project-card" key={project.name}>
-              <div className="project-header-row">
-                <strong>{project.name}</strong>
-                <span>Due {project.due}</span>
-              </div>
+          {projectGroups.map((project) => {
+            const progress = Math.round((project.completed / project.total) * 100);
 
-              <div className="project-progress">
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: `${Math.round((project.completed / project.total) * 100)}%` }} />
+            return (
+              <div className="project-card" key={project.name}>
+                <div className="project-header-row">
+                  <strong>{project.name}</strong>
+                  <span>Due {project.due}</span>
                 </div>
-                <span>{Math.round((project.completed / project.total) * 100)}%</span>
-              </div>
 
-              <div className="project-metrics">
-                <span>{project.completed} completed</span>
-                <span>{project.total - project.completed} remaining</span>
+                <div className="project-progress">
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${progress}%` }} />
+                  </div>
+                  <span>{progress}%</span>
+                </div>
+
+                <div className="project-metrics">
+                  <span>{project.completed} completed</span>
+                  <span>{project.total - project.completed} remaining</span>
+                </div>
+
+                <Link href="/projects/launch-sprint" className="secondary-link">
+                  View details
+                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </AppShell>
   );
 }
+

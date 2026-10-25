@@ -1,7 +1,8 @@
-"use client";
+import "use client";
 
 import { useMemo, useState } from "react";
-import { tasks, teamMembers, calendarEvents, milestones, quickStats } from "@/data/mockData";
+
+import { calendarEvents, milestones, quickStats, tasks, teamMembers } from "@/data/mockData";
 
 type Status = "Backlog" | "In Progress" | "Review" | "Done";
 
@@ -20,15 +21,14 @@ export default function HomePage() {
   }, [selectedProject, selectedUser]);
 
   const board = useMemo(() => {
-    return columns.reduce((acc, column) => {
-      acc[column] = filteredTasks.filter((task) => task.status === column);
-      return acc;
-    }, {} as Record<Status, typeof tasks>);
+    return columns.reduce(
+      (acc, column) => {
+        acc[column] = filteredTasks.filter((task) => task.status === column);
+        return acc;
+      },
+      {} as Record<Status, typeof tasks>
+    );
   }, [filteredTasks]);
-
-  const upcomingEvents = useMemo(() => {
-    return calendarEvents.slice(0, 4);
-  }, []);
 
   return (
     <main className="page-shell">
@@ -42,12 +42,24 @@ export default function HomePage() {
         </div>
 
         <nav className="nav-menu">
-          <a className="nav-item active">Overview</a>
-          <a className="nav-item">Projects</a>
-          <a className="nav-item">Calendar</a>
-          <a className="nav-item">Tasks</a>
-          <a className="nav-item">Reports</a>
-          <a className="nav-item">Settings</a>
+          <a className="nav-item active" href="/">
+            Overview
+          </a>
+          <a className="nav-item" href="/projects">
+            Projects
+          </a>
+          <a className="nav-item" href="/calendar">
+            Calendar
+          </a>
+          <a className="nav-item" href="/tasks">
+            Tasks
+          </a>
+          <a className="nav-item" href="/reports">
+            Reports
+          </a>
+          <a className="nav-item" href="/settings">
+            Settings
+          </a>
         </nav>
 
         <div className="sidebar-card">
@@ -72,24 +84,31 @@ export default function HomePage() {
             <p className="eyebrow">Monday, 18 Nov 2026</p>
             <h1>Product Launch Sprint</h1>
           </div>
+
           <div className="topbar-actions">
-            <button className="secondary-button">Share</button>
-            <button className="primary-button">New Task</button>
+            <button className="secondary-button" type="button">
+              Share
+            </button>
+            <button className="primary-button" type="button">
+              New Task
+            </button>
           </div>
         </header>
 
         <div className="filters-row">
-          <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
+          <select value={selectedProject} onChange={(event) => setSelectedProject(event.target.value)}>
             <option>All Projects</option>
             <option>Website Redesign</option>
             <option>Marketing Launch</option>
             <option>Operations</option>
           </select>
 
-          <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
+          <select value={selectedUser} onChange={(event) => setSelectedUser(event.target.value)}>
             <option>All Team</option>
             {teamMembers.map((member) => (
-              <option key={member.name}>{member.name}</option>
+              <option key={member.name} value={member.name}>
+                {member.name}
+              </option>
             ))}
           </select>
         </div>
@@ -97,7 +116,9 @@ export default function HomePage() {
         <div className="stats-grid">
           {quickStats.map((stat) => (
             <div className="stat-card" key={stat.label}>
-              <div className="stat-icon" style={{ background: stat.tint }}>{stat.icon}</div>
+              <div className="stat-icon" style={{ background: stat.tint }}>
+                {stat.icon}
+              </div>
               <div>
                 <p>{stat.label}</p>
                 <h3>{stat.value}</h3>
@@ -128,6 +149,7 @@ export default function HomePage() {
                           <span className={`priority priority-${task.priority.toLowerCase()}`}>{task.priority}</span>
                           <span className="task-project">{task.project}</span>
                         </div>
+
                         <h4>{task.title}</h4>
                         <p>{task.description}</p>
 
@@ -179,7 +201,7 @@ export default function HomePage() {
                 <span>Next 4</span>
               </div>
 
-              {upcomingEvents.map((event) => (
+              {calendarEvents.map((event) => (
                 <div className="event-item" key={event.title}>
                   <div className="event-time">{event.time}</div>
                   <div>
@@ -212,3 +234,4 @@ export default function HomePage() {
     </main>
   );
 }
+

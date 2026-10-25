@@ -123,3 +123,4 @@ export const milestones = [
   { name: "Campaign launch", date: "Nov 25" },
   { name: "Team planning", date: "Nov 30" },
 ];
+
