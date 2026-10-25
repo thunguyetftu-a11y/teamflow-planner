@@ -1,0 +1,143 @@
+import { AppShell } from "@/components/AppShell";
+import { calendarEvents, milestones, quickStats, tasks, teamMembers } from "@/data/mockData";
+
+const columns = ["Backlog", "In Progress", "Review", "Done"] as const;
+
+export default function HomePage() {
+  const board = columns.reduce((acc, column) => {
+    acc[column] = tasks.filter((task) => task.status === column);
+    return acc;
+  }, {} as Record<(typeof columns)[number], typeof tasks>);
+
+  return (
+    <AppShell title="Product Launch Sprint" subtitle="Monday, 18 Nov 2026">
+      <div className="stats-grid">
+        {quickStats.map((stat) => (
+          <div className="stat-card" key={stat.label}>
+            <div className="stat-icon" style={{ background: stat.tint }}>{stat.icon}</div>
+            <div>
+              <p>{stat.label}</p>
+              <h3>{stat.value}</h3>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="main-grid">
+        <div className="board-panel">
+          <div className="section-header">
+            <h3>Team Board</h3>
+            <span>{tasks.length} active tasks</span>
+          </div>
+
+          <div className="board-columns">
+            {columns.map((column) => (
+              <div className="board-column" key={column}>
+                <div className="column-header">
+                  <span>{column}</span>
+                  <span className="count-pill">{board[column].length}</span>
+                </div>
+
+                <div className="task-list">
+                  {board[column].map((task) => (
+                    <article className="task-card" key={task.id}>
+                      <div className="task-topline">
+                        <span className={`priority priority-${task.priority.toLowerCase()}`}>{task.priority}</span>
+                        <span className="task-project">{task.project}</span>
+                      </div>
+
+                      <h4>{task.title}</h4>
+                      <p>{task.description}</p>
+
+                      <div className="meta-row">
+                        <span>{task.deadline}</span>
+                        <span>{task.progress}%</span>
+                      </div>
+
+                      <div className="progress-track">
+                        <div className="progress-fill" style={{ width: `${task.progress}%` }} />
+                      </div>
+
+                      <div className="task-footer">
+                        <div className="avatar-mini" style={{ background: task.assigneeColor }}>
+                          {task.assignee[0]}
+                        </div>
+                        <span>{task.assignee}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <aside className="side-stack">
+          <div className="panel-box">
+            <div className="section-header">
+              <h3>Calendar</h3>
+              <span>Week view</span>
+            </div>
+
+            <div className="calendar-grid">
+              {Array.from({ length: 7 }).map((_, index) => (
+                <div className="day-cell" key={index}>
+                  <small>{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index]}</small>
+                  <strong>{index + 14}</strong>
+                  {index === 1 && <span className="calendar-dot active" />}
+                  {index === 4 && <span className="calendar-dot" />}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel-box">
+            <div className="section-header">
+              <h3>Upcoming</h3>
+              <span>Next 4</span>
+            </div>
+
+            {calendarEvents.map((event) => (
+              <div className="event-item" key={event.title}>
+                <div className="event-time">{event.time}</div>
+                <div>
+                  <strong>{event.title}</strong>
+                  <p>{event.type}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="panel-box">
+            <div className="section-header">
+              <h3>Milestones</h3>
+              <span>Focused</span>
+            </div>
+
+            {milestones.map((milestone) => (
+              <div className="milestone-item" key={milestone.name}>
+                <div className="milestone-bullet" />
+                <div>
+                  <strong>{milestone.name}</strong>
+                  <p>{milestone.date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+
+      <div className="team-strip">
+        {teamMembers.map((member) => (
+          <div className="mini-member" key={member.name}>
+            <div className="avatar" style={{ background: member.color }}>{member.name[0]}</div>
+            <div>
+              <strong>{member.name}</strong>
+              <span>{member.role}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </AppShell>
+  );
+}
