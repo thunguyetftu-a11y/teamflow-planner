@@ -1,17 +1,8 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-
-const navItems = [
-  { label: "Overview", href: "/" },
-  { label: "Projects", href: "/projects" },
-  { label: "Calendar", href: "/calendar" },
-  { label: "Tasks", href: "/tasks" },
-  { label: "Reports", href: "/reports" },
-  { label: "Settings", href: "/settings" },
-];
+import { useEffect, useState } from "react";
+import { clearCurrentUser, getCurrentUser } from "@/data/mockData";
 
 export function AppShell({
   title,
@@ -20,9 +11,18 @@ export function AppShell({
 }: {
   title: string;
   subtitle?: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
+
+  const handleSignOut = () => {
+    clearCurrentUser();
+    setUser(null);
+  };
 
   return (
     <div className="page-shell">
@@ -36,25 +36,34 @@ export function AppShell({
         </div>
 
         <nav className="nav-menu">
-          {navItems.map((item) => {
-            const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-
-            return (
-              <Link key={item.href} href={item.href} className={`nav-item ${active ? "active" : ""}`}>
-                {item.label}
-              </Link>
-            );
-          })}
+          <Link href="/" className="nav-item active">
+            Overview
+          </Link>
+          <Link href="/projects" className="nav-item">
+            Projects
+          </Link>
+          <Link href="/calendar" className="nav-item">
+            Calendar
+          </Link>
+          <Link href="/tasks" className="nav-item">
+            Tasks
+          </Link>
+          <Link href="/reports" className="nav-item">
+            Reports
+          </Link>
+          <Link href="/settings" className="nav-item">
+            Settings
+          </Link>
         </nav>
 
         <div className="sidebar-card">
           <p className="eyebrow">Team members</p>
           <div className="member-stack">
             {[
-              { name: "Alicia", role: "Product Lead" },
-              { name: "Harold", role: "Design" },
-              { name: "Mila", role: "PM" },
-              { name: "Sam", role: "Developer" },
+              { name: "Alicia Johnson", role: "Product Lead" },
+              { name: "Harold Lee", role: "Design" },
+              { name: "Mila Chen", role: "PM" },
+              { name: "Sam Patel", role: "Developer" },
             ].map((member) => (
               <div className="member-item" key={member.name}>
                 <div className="avatar" style={{ background: "#4d8cff" }}>
@@ -81,9 +90,19 @@ export function AppShell({
             <button className="secondary-button" type="button">
               Share
             </button>
-            <Link href="/login" className="primary-button top-link-button">
-              Sign in
-            </Link>
+
+            {user ? (
+              <div className="user-menu">
+                <span>{user.name || user.email}</span>
+                <button type="button" className="text-button" onClick={handleSignOut}>
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="primary-button top-link-button">
+                Sign in
+              </Link>
+            )}
           </div>
         </header>
 
@@ -92,4 +111,3 @@ export function AppShell({
     </div>
   );
 }
-

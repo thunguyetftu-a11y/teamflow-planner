@@ -1,774 +1,230 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f4f7fb;
-  color: #162033;
+import "use client";
+
+import { useMemo, useState } from "react";
+
+import { calendarEvents, getTaskStatus, milestones, quickStats, tasks, teamMembers } from "@/data/mockData";
+
+const columns = ["Open", "Missed", "Overdue", "Done"] as const;
+
+export default function HomePage() {
+  const [selectedProject, setSelectedProject] = useState<string>("All Projects");
+  const [selectedUser, setSelectedUser] = useState<string>("All Team");
+
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      const projectMatch = selectedProject === "All Projects" || task.project === selectedProject;
+      const userMatch = selectedUser === "All Team" || task.assignees?.includes(selectedUser) || task.assignee === selectedUser;
+      return projectMatch && userMatch;
+    });
+  }, [selectedProject, selectedUser]);
+
+  const board = useMemo(() => {
+    return columns.reduce(
+      (acc, column) => {
+        acc[column] = filteredTasks.filter((task) => getTaskStatus(task) === column);
+        return acc;
+      },
+      {} as Record<(typeof columns)[number], typeof tasks>
+    );
+  }, [filteredTasks]);
+
+  return (
+    <main className="page-shell">
+      <aside className="sidebar">
+        <div className="brand-row">
+          <div className="brand-mark">T</div>
+          <div>
+            <p className="eyebrow">Workspace</p>
+            <h2>TeamFlow</h2>
+          </div>
+        </div>
+
+        <nav className="nav-menu">
+          <a className="nav-item active" href="/">
+            Overview
+          </a>
+          <a className="nav-item" href="/projects">
+            Projects
+          </a>
+          <a className="nav-item" href="/calendar">
+            Calendar
+          </a>
+          <a className="nav-item" href="/tasks">
+            Tasks
+          </a>
+          <a className="nav-item" href="/reports">
+            Reports
+          </a>
+          <a className="nav-item" href="/settings">
+            Settings
+          </a>
+        </nav>
+
+        <div className="sidebar-card">
+          <p className="eyebrow">Team members</p>
+          <div className="member-stack">
+            {teamMembers.map((member) => (
+              <div className="member-item" key={member.name}>
+                <div className="avatar" style={{ background: member.color }}>{member.name[0]}</div>
+                <div>
+                  <strong>{member.name}</strong>
+                  <span>{member.role}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      <section className="content-panel">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Monday, 18 Nov 2026</p>
+            <h1>Product Launch Sprint</h1>
+          </div>
+
+          <div className="topbar-actions">
+            <button className="secondary-button" type="button">
+              Share
+            </button>
+            <button className="primary-button" type="button">
+              New Task
+            </button>
+          </div>
+        </header>
+
+        <div className="filters-row">
+          <select value={selectedProject} onChange={(event) => setSelectedProject(event.target.value)}>
+            <option>All Projects</option>
+            <option>Website Redesign</option>
+            <option>Marketing Launch</option>
+            <option>Operations</option>
+          </select>
+
+          <select value={selectedUser} onChange={(event) => setSelectedUser(event.target.value)}>
+            <option>All Team</option>
+            {teamMembers.map((member) => (
+              <option key={member.name} value={member.name}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="stats-grid">
+          {quickStats.map((stat) => (
+            <div className="stat-card" key={stat.label}>
+              <div className="stat-icon" style={{ background: stat.tint }}>
+                {stat.icon}
+              </div>
+              <div>
+                <p>{stat.label}</p>
+                <h3>{stat.value}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="main-grid">
+          <div className="board-panel">
+            <div className="section-header">
+              <h3>Team Board</h3>
+              <span>{filteredTasks.length} tasks</span>
+            </div>
+
+            <div className="board-columns">
+              {columns.map((column) => (
+                <div className="board-column" key={column}>
+                  <div className="column-header">
+                    <span>{column}</span>
+                    <span className="count-pill">{board[column].length}</span>
+                  </div>
+
+                  <div className="task-list">
+                    {board[column].map((task) => (
+                      <article className="task-card" key={task.id}>
+                        <div className="task-topline">
+                          <span className={`priority priority-${task.priority.toLowerCase()}`}>{task.priority}</span>
+                          <span className="task-project">{task.project}</span>
+                        </div>
+
+                        <h4>{task.title}</h4>
+                        <p>{task.description.replace(/<[^>]+>/g, "")}</p>
+
+                        <div className="meta-row">
+                          <span>Start: {task.startDate}</span>
+                          <span>Due: {task.dueDate}</span>
+                        </div>
+
+                        <div className="task-footer">
+                          <div className="avatar-mini" style={{ background: task.assigneeColor }}>
+                            {task.assignee[0]}
+                          </div>
+                          <span>{task.assignee}</span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <aside className="side-stack">
+            <div className="panel-box">
+              <div className="section-header">
+                <h3>Calendar</h3>
+                <span>Week view</span>
+              </div>
+
+              <div className="calendar-grid">
+                {Array.from({ length: 7 }).map((_, index) => (
+                  <div className="day-cell" key={index}>
+                    <small>{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index]}</small>
+                    <strong>{index + 14}</strong>
+                    {index === 1 && <span className="calendar-dot active" />}
+                    {index === 4 && <span className="calendar-dot" />}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel-box">
+              <div className="section-header">
+                <h3>Upcoming</h3>
+                <span>Next 4</span>
+              </div>
+
+              {calendarEvents.map((event) => (
+                <div className="event-item" key={event.title}>
+                  <div className="event-time">{event.time}</div>
+                  <div>
+                    <strong>{event.title}</strong>
+                    <p>{event.type}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="panel-box">
+              <div className="section-header">
+                <h3>Milestones</h3>
+                <span>Focused</span>
+              </div>
+
+              {milestones.map((milestone) => (
+                <div className="milestone-item" key={milestone.name}>
+                  <div className="milestone-bullet" />
+                  <div>
+                    <strong>{milestone.name}</strong>
+                    <p>{milestone.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  );
 }
-
-* {
-  box-sizing: border-box;
-}
-
-button,
-select,
-input {
-  font: inherit;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.page-shell {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: 100vh;
-}
-
-.sidebar {
-  background: #101a2b;
-  color: #edf3ff;
-  padding: 24px 18px;
-}
-
-.brand-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.brand-mark {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #6aa8ff, #6558ff);
-  color: white;
-  font-weight: 700;
-}
-
-.eyebrow {
-  margin: 0;
-  color: #8ba4d4;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.brand-row h2,
-.topbar h1,
-.section-header h3,
-.task-card h4,
-.member-item strong,
-.event-item strong,
-.milestone-item strong,
-.team-card strong {
-  margin: 0;
-}
-
-.nav-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.nav-item {
-  display: block;
-  padding: 12px 14px;
-  border-radius: 10px;
-  color: #dfe9ff;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.nav-item.active,
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-card {
-  margin-top: 28px;
-  padding: 16px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-}
-
-.member-stack {
-  margin-top: 14px;
-  display: grid;
-  gap: 12px;
-}
-
-.member-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.member-item span {
-  display: block;
-  color: #bfcfe9;
-  font-size: 12px;
-}
-
-.avatar,
-.avatar-mini {
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 700;
-}
-
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-}
-
-.content-panel {
-  padding: 24px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.primary-button,
-.secondary-button {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.primary-button {
-  background: linear-gradient(135deg, #6aa8ff, #5a67ff);
-  color: white;
-}
-
-.secondary-button {
-  background: #eaf1ff;
-  color: #1a2f54;
-}
-
-.top-link-button {
-  line-height: 1;
-}
-
-.filters-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.filters-row select {
-  min-width: 180px;
-  background: white;
-  border: 1px solid #dfe7f2;
-  border-radius: 10px;
-  padding: 10px 12px;
-  color: #203150;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.stat-card {
-  background: white;
-  border: 1px solid #e4ebf7;
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 10px 20px rgba(32, 49, 80, 0.03);
-}
-
-.stat-card p {
-  margin: 0 0 6px;
-  color: #617699;
-  font-size: 13px;
-}
-
-.stat-card h3 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.stat-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-}
-
-.main-grid {
-  display: grid;
-  grid-template-columns: 1.7fr 0.9fr;
-  gap: 20px;
-}
-
-.board-panel,
-.panel-box {
-  background: #fff;
-  border: 1px solid #e4ebf7;
-  border-radius: 18px;
-  box-shadow: 0 10px 20px rgba(32, 49, 80, 0.03);
-}
-
-.board-panel {
-  padding: 18px;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.section-header span {
-  color: #7387a7;
-  font-size: 12px;
-}
-
-.board-columns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(220px, 1fr));
-  gap: 16px;
-  overflow-x: auto;
-}
-
-.board-column {
-  background: #f6f9ff;
-  border-radius: 14px;
-  padding: 12px;
-  min-height: 520px;
-}
-
-.column-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  color: #243a5a;
-  font-weight: 700;
-}
-
-.count-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 8px;
-  border-radius: 999px;
-  background: #dfeaff;
-  color: #254b86;
-  font-size: 12px;
-}
-
-.task-list {
-  display: grid;
-  gap: 12px;
-}
-
-.task-card {
-  background: white;
-  border: 1px solid #e6edf9;
-  border-radius: 14px;
-  padding: 12px;
-}
-
-.task-topline,
-.meta-row,
-.task-footer,
-.project-header-row,
-.project-metrics,
-.settings-row,
-.detail-grid {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.task-project,
-.meta-row,
-.task-footer,
-.task-card p,
-.project-metrics,
-.settings-row span,
-.detail-copy,
-.meta-label {
-  color: #5d7293;
-  font-size: 12px;
-}
-
-.task-card h4 {
-  margin: 12px 0 8px;
-  font-size: 16px;
-  color: #1b2940;
-}
-
-.task-card p {
-  margin: 0 0 10px;
-  line-height: 1.5;
-}
-
-.priority {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.priority-high {
-  background: #ffe5e9;
-  color: #ca3e52;
-}
-
-.priority-medium {
-  background: #fff4d6;
-  color: #ae7d00;
-}
-
-.priority-low {
-  background: #e2f8eb;
-  color: #1d8b56;
-}
-
-.progress-track {
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: #edf2fb;
-  overflow: hidden;
-  margin: 12px 0 10px;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #61b0ff, #5a67ff);
-}
-
-.side-stack {
-  display: grid;
-  gap: 18px;
-}
-
-.panel-box {
-  padding: 18px;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(32px, 1fr));
-  gap: 10px;
-}
-
-.day-cell {
-  position: relative;
-  min-height: 64px;
-  background: #f6f9ff;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: #617699;
-}
-
-.day-cell strong {
-  color: #1d2f4d;
-}
-
-.calendar-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #bed4ff;
-}
-
-.calendar-dot.active {
-  background: #5768ff;
-}
-
-.event-item,
-.milestone-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 10px 0;
-  border-top: 1px solid #edf2fb;
-}
-
-.event-item:first-of-type,
-.milestone-item:first-of-type {
-  border-top: none;
-  padding-top: 0;
-}
-
-.event-time {
-  min-width: 62px;
-  background: #eef5ff;
-  color: #2c5eaf;
-  border-radius: 10px;
-  padding: 8px 8px;
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.event-item p,
-.milestone-item p {
-  margin: 4px 0 0;
-  color: #6880a4;
-  font-size: 12px;
-}
-
-.milestone-bullet {
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #6aa8ff, #5a67ff);
-}
-
-.project-list,
-.settings-list,
-.member-list-inline {
-  display: grid;
-  gap: 14px;
-}
-
-.project-card {
-  border: 1px solid #ebf1fa;
-  border-radius: 14px;
-  padding: 16px;
-  background: #fafcff;
-}
-
-.project-progress {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.project-progress .progress-track {
-  margin: 0;
-}
-
-.secondary-link {
-  display: inline-block;
-  margin-top: 12px;
-  color: #2d5eb5;
-  font-weight: 600;
-}
-
-.detail-layout {
-  display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
-  gap: 20px;
-}
-
-.detail-copy {
-  margin: 0 0 16px;
-  line-height: 1.6;
-}
-
-.detail-grid {
-  justify-content: flex-start;
-  gap: 30px;
-  margin-top: 18px;
-}
-
-.detail-grid > div {
-  display: grid;
-  gap: 6px;
-}
-
-.meta-label {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.member-list-inline {
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  margin-bottom: 18px;
-}
-
-.team-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #edf4ff;
-  color: #2b5aa3;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.inline-button {
-  display: inline-flex;
-  margin-top: 8px;
-}
-
-.chart-bars {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
-  align-items: end;
-  min-height: 240px;
-  padding: 20px 10px 0;
-}
-
-.chart-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  height: 100%;
-}
-
-.chart-bar {
-  width: 100%;
-  min-height: 30px;
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(180deg, #7bb8ff, #5867ff);
-}
-
-.chart-column span {
-  color: #6f83a5;
-  font-size: 12px;
-}
-
-.settings-row {
-  padding: 12px 0;
-  border-bottom: 1px solid #edf2fb;
-}
-
-.settings-row strong {
-  font-size: 13px;
-  color: #203150;
-}
-
-.task-table-wrap {
-  overflow-x: auto;
-}
-
-.task-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 760px;
-}
-
-.task-table th,
-.task-table td {
-  text-align: left;
-  padding: 14px 12px;
-  border-bottom: 1px solid #edf2fb;
-  color: #203150;
-}
-
-.task-table th {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #7184a1;
-}
-
-.owner-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.avatar-mini {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  font-size: 12px;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.status-badge.backlog {
-  background: #eaf1ff;
-  color: #395ecb;
-}
-
-.status-badge.in-progress {
-  background: #fff3d9;
-  color: #a66b00;
-}
-
-.status-badge.review {
-  background: #e7f7ef;
-  color: #1d8a63;
-}
-
-.status-badge.done {
-  background: #e2ebff;
-  color: #3c5ad0;
-}
-
-.compact-progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.small-track {
-  width: 100px;
-  margin: 0;
-}
-
-.auth-shell {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #edf4ff 0%, #f7fafe 100%);
-  padding: 24px;
-}
-
-.auth-card {
-  width: min(420px, 100%);
-  background: white;
-  border: 1px solid #e5edf9;
-  border-radius: 22px;
-  box-shadow: 0 20px 45px rgba(12, 30, 57, 0.08);
-  padding: 28px;
-}
-
-.auth-brand {
-  margin-bottom: 10px;
-}
-
-.auth-card h1 {
-  margin: 0;
-  font-size: 30px;
-}
-
-.auth-subtext {
-  margin: 8px 0 20px;
-  color: #6780a3;
-}
-
-.auth-form {
-  display: grid;
-  gap: 16px;
-}
-
-.auth-form label {
-  display: grid;
-  gap: 8px;
-  color: #2a3d5c;
-  font-weight: 600;
-}
-
-.auth-form input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #dfe9f7;
-  border-radius: 10px;
-  background: #f9fbff;
-}
-
-.auth-button {
-  width: 100%;
-  margin-top: 4px;
-}
-
-.auth-links {
-  margin-top: 18px;
-  display: flex;
-  justify-content: space-between;
-  color: #456ba7;
-  font-size: 14px;
-}
-
-@media (max-width: 1100px) {
-  .main-grid,
-  .detail-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 820px) {
-  .page-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    padding-bottom: 12px;
-  }
-
-  .content-panel {
-    padding: 18px 14px 28px;
-  }
-
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .filters-row {
-    flex-direction: column;
-  }
-
-  .filters-row select {
-    width: 100%;
-  }
-
-  .chart-bars {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-

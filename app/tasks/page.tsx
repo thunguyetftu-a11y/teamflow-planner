@@ -1,58 +1,63 @@
-import { AppShell } from "@/components/AppShell";
-import { tasks, teamMembers } from "@/data/mockData";
+'use client';
 
-export default function TasksPage() {
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+import { setCurrentUser } from "@/data/mockData";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("alicia@teamflow.com");
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    setCurrentUser({
+      name: "Alicia Johnson",
+      email,
+    });
+    router.push("/");
+  };
+
   return (
-    <AppShell title="Tasks" subtitle="All team work items">
-      <div className="panel-box full-width">
-        <div className="section-header">
-          <h3>Task overview</h3>
-          <span>{tasks.length} items</span>
+    <main className="auth-shell">
+      <div className="auth-card">
+        <div className="brand-row auth-brand">
+          <div className="brand-mark">T</div>
+          <div>
+            <p className="eyebrow">Workspace</p>
+            <h2>TeamFlow</h2>
+          </div>
         </div>
 
-        <div className="task-table-wrap">
-          <table className="task-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Project</th>
-                <th>Owner</th>
-                <th>Status</th>
-                <th>Due</th>
-                <th>Progress</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map((task) => (
-                <tr key={task.id}>
-                  <td>{task.title}</td>
-                  <td>{task.project}</td>
-                  <td>
-                    <div className="owner-cell">
-                      <span className="avatar-mini" style={{ background: task.assigneeColor }}>{task.assignee[0]}</span>
-                      {task.assignee}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${task.status.toLowerCase().replace(/\s+/g, "-")}`}>
-                      {task.status}
-                    </span>
-                  </td>
-                  <td>{task.deadline}</td>
-                  <td>
-                    <div className="compact-progress">
-                      <span>{task.progress}%</span>
-                      <div className="progress-track small-track">
-                        <div className="progress-fill" style={{ width: `${task.progress}%` }} />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h1>Welcome back</h1>
+        <p className="auth-subtext">Sign in to continue planning work and sharing calendars.</p>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="name@company.com"
+            />
+          </label>
+
+          <label>
+            Password
+            <input type="password" placeholder="••••••••" />
+          </label>
+
+          <button type="submit" className="primary-button auth-button">
+            Sign in
+          </button>
+        </form>
+
+        <div className="auth-links">
+          <Link href="/">Back to dashboard</Link>
+          <a href="#">Create account</a>
         </div>
       </div>
-    </AppShell>
+    </main>
   );
 }
